@@ -290,9 +290,7 @@ const AddSubscription = () => {
     try {
       const response = await api.post('/api/subscriptions', {
         ...formData,
-        amount: parseFloat(formData.amount),
-        userEmail: user?.email,          // <-- ADDED: Required for email reminders
-        userId: user?._id                // <-- OPTIONAL but recommended
+        amount: parseFloat(formData.amount)
       });
 
       if (response.status === 200 || response.status === 201) {

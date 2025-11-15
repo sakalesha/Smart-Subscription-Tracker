@@ -1,19 +1,31 @@
 import express from "express";
 import Subscription from "../models/Subscription.js";
+import User from "../models/User.js";     // <-- Needed for email fallback
 import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
 // Middleware
-function verifyToken(req, res, next) {
+async function verifyToken(req, res, next) {
   const token = req.headers.authorization?.split(" ")[1];
-  if (!token) return res.status(403).json({ message: "No token" });
+  if (!token) return res.status(403).json({ message: "No token provided" });
 
-  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) return res.status(403).json({ message: "Invalid token" });
 
     req.userId = decoded.id;
-    req.userEmail = decoded.email;    // <-- STORE EMAIL FROM TOKEN
+    req.userEmail = decoded.email;
+
+    // SAFETY: If token didn’t include email, fetch from DB
+    if (!req.userEmail) {
+      const user = await User.findById(req.userId).lean();
+      req.userEmail = user?.email;
+    }
+
+    if (!req.userEmail) {
+      return res.status(500).json({ message: "User email missing, cannot continue" });
+    }
+
     next();
   });
 }
@@ -24,20 +36,25 @@ router.post("/", verifyToken, async (req, res) => {
     const sub = await Subscription.create({
       ...req.body,
       userId: req.userId,
-      userEmail: req.userEmail,       // <-- ALWAYS store email here
+      userEmail: req.userEmail,
+      lastReminderDate: null      // ensure this always exists
     });
 
-    res.json(sub);
+    res.status(201).json(sub);
   } catch (error) {
     console.error("Create subscription error:", error);
-    res.status(500).json({ message: "Failed to create subscription" });
+    res.status(500).json({ message: "Failed to create subscription", error });
   }
 });
 
 // Get All Subscriptions for User
 router.get("/", verifyToken, async (req, res) => {
-  const subs = await Subscription.find({ userId: req.userId });
-  res.json(subs);
+  try {
+    const subs = await Subscription.find({ userId: req.userId });
+    res.json(subs);
+  } catch (error) {
+    res.status(500).json({ message: "Failed to fetch subscriptions" });
+  }
 });
 
 // Update Subscription
@@ -69,7 +86,7 @@ router.delete("/:id", verifyToken, async (req, res) => {
 
     const sub = await Subscription.findOneAndDelete({
       _id: req.params.id,
-      userId: req.userId,
+      userId: req.userId
     });
 
     if (!sub) {
