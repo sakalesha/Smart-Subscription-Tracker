@@ -10,8 +10,7 @@ import SummaryCards from './SummaryCards';
 import SpendingCharts from './SpendingCharts';
 
 const Dashboard = () => {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
+const Dashboard = () => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -70,7 +69,7 @@ const Dashboard = () => {
 
   const handleDeleteSubscription = async (id) => {
     try {
-      const response = await api.delete(`/api/subscriptions/${id}`);
+      await api.delete(`/api/subscriptions/${id}`);
       setSubscriptions(prev => prev.filter(sub => sub._id !== id));
       setError(null);
     } catch (error) {

@@ -8,7 +8,6 @@ import ThemeToggle from './ThemeToggle';
 const Navbar = () => {
   const navigate = useNavigate();
   const { user, logout } = useAuth();
-  const { isDark } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = React.useState(false);
 
   const navItems = [

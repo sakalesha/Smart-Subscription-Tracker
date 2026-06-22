@@ -9,7 +9,6 @@ import Navbar from './Navbar';
 
 const AddSubscription = () => {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const [formData, setFormData] = useState({
     serviceName: '',
     amount: '',

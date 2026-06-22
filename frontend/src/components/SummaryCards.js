@@ -4,7 +4,6 @@ import { motion } from 'framer-motion';
 const SummaryCards = ({ subscriptions, forecast }) => {
   const totalSubscriptions = subscriptions.length;
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'Active').length;
-  const expiredSubscriptions = subscriptions.filter(sub => sub.status === 'Expired').length;
 
   const totalMonthlySpending = subscriptions
     .filter(sub => sub.status === 'Active')
