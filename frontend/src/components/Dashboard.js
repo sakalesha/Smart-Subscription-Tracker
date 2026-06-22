@@ -10,7 +10,6 @@ import SummaryCards from './SummaryCards';
 import SpendingCharts from './SpendingCharts';
 
 const Dashboard = () => {
-const Dashboard = () => {
   const [subscriptions, setSubscriptions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
