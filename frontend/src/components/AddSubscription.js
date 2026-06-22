@@ -4,7 +4,6 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../utils/api';
-import { useAuth } from '../contexts/AuthContext';
 import Navbar from './Navbar';
 
 const AddSubscription = () => {
