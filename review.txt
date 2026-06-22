@@ -1,0 +1,92 @@
+Problem statement:
+Smart Subscription Tracker solves the problem of "subscription fatigue" and accidental spending.
+
+1. Stop Forgetting About Renewals: 
+It prevents surprise credit card charges by sending you automated email reminders 3 days before a subscription is set to auto-renew, giving you time to cancel it if you don't use it anymore.
+
+2. See Where Their Money Goes: 
+It provides a single dashboard to see exactly how much money you are spending on subscriptions every month or year, replacing messy spreadsheets.
+
+3. Keep Track of Everything in One Place: 
+It organizes all your services, categories, and payment cycles so you never lose track of what you are actually paying for.
+
+Basically, it acts as a financial assistant to help you stop wasting money on unused subscriptions!
+
+Does this problems already solved?
+Yes, absolutely it has already been solved by several big companies and apps in the market.
+
+Here is how this problem is typically solved in the real world right now:
+
+1. Automated Financial Assistants (e.g., Rocket Money / Copilot Money)
+
+- How they solve it: These tools use Open Banking APIs (like Plaid) to connect directly to users' bank accounts and credit cards. Algorithms scan transaction histories to automatically identify recurring payments.
+- Features: They predict upcoming charges, alert users to price hikes, and some even offer concierge services to negotiate or cancel subscriptions on the user's behalf.
+- Contrast to your project: They rely on deep financial data access and machine learning, whereas your project relies on user-controlled, manual data entry.
+
+2. Manual Tracker Applications (e.g., Bobby, Subscriptions by Sift)
+
+- How they solve it: These are primarily mobile applications that function very similarly to your project. Users manually input their services, billing cycles, and costs.
+- Features: They provide visual dashboards, push notifications (instead of emails) before a bill is due, and multi-currency support.
+- Contrast to your project: These are typically iOS/Android native apps focused on mobile notifications, whereas your project is a web-based, full-stack application leveraging email integrations (via Resend/node-cron) for its alerting system.
+
+3. Integrated Banking Solutions
+
+- How they solve it: Modern "challenger" banks (like Revolut, Monzo, or Apple Card features) have begun integrating recurring payment identification heavily into their core banking apps.
+- Features: They group identical monthly transactions into a "Subscriptions" tab and can sometimes block merchants directly if the user wants to cancel.
+- Contrast to your project: These require the user to bank exclusively with that institution to get the analytics, whereas standalone trackers are bank-agnostic.
+
+Conclusion
+Your project solves a validated problem that millions of consumers face. While the market contains massive, automated solutions (like Rocket Money), your application fills the niche of a bank-agnostic, privacy-focused, manual-entry tool for users who want complete control over their data without linking their actual bank accounts to third-party APIs.
+
+
+If they are already solved, what is the purpose of this project?
+Even though massive companies have already solved this problem, building a project like the Smart Subscription Tracker serves several highly valuable purposes, particularly for a software developer.
+
+1. Portfolio & Skill Demonstration (The Primary Purpose)
+The biggest purpose of this project is to showcase your ability as a Full-Stack Engineer. Building a basic "To-Do List" is easy, but tracking subscriptions requires solving real, complex engineering challenges. This project proves to employers or clients that you can handle:
+
+Security & Auth: Managing secure login sessions using JWTs and bcrypt.
+Background Jobs: Writing server-side cron jobs to automate tasks (sending emails) precisely on schedule, while preventing duplicates.
+Data Architecture: Designing a MongoDB schema that handles complex relationships and dates.
+Data Visualization: Taking raw data and turning it into interactive charts (using Recharts) on the frontend.
+2. Privacy & Total Data Control
+Apps like Rocket Money or Truebill require users to link their actual bank accounts using services like Plaid. Many people—especially tech-savvy users—refuse to hand over their bank login credentials to a third-party startup just to track a Netflix bill.
+
+The Purpose: Your project serves as a secure, privacy-first alternative. By relying on manual entry, users remain in 100% control of their financial data with zero risk of banking breaches.
+3. A Clean, Ad-Free Utility
+Commercial tracking apps survive by upselling. They constantly notify you to upgrade to a "Premium" tier, show you ads, or try to sell you alternative insurance and credit cards.
+
+The Purpose: Your project provides a highly focused, ad-free, and straightforward utility. It does exactly what it says—tracks subscriptions and sends an email—without trying to upsell the user.
+4. Groundwork for a SaaS (Software as a Service)
+While it is currently a personal portfolio project, the architecture you have built (User registration, secure routing, database isolation) is the exact foundation needed for a SaaS product.
+
+The Purpose: If you ever wanted to monetize it, you already have the core engine built. You could add multi-user family plans, team billing for small businesses, or export options for accountants.
+In summary: You didn't build this to put Rocket Money out of business. You built it to prove you can architect a complex, real-world application from scratch while providing a safe, private alternative to data-hungry commercial apps.
+
+
+Is there any problem that as not addressed till now be frank?
+
+1. The "Introductory Offer" Trap (Dynamic Pricing)
+- The app assumes a subscription is a fixed amount (e.g., ₹499/month forever). In reality, companies constantly use promotional pricing (e.g., "₹99 for the first 3 months, then ₹999/month").
+- The Problem: 
+    - Your app has no way to warn a user that a price is about to increase. The user will just get a reminder for the original ₹99, and then be shocked when ₹999 is drafted from their bank.
+
+2. The Shared Subscription Dilemma
+- Almost everyone today shares a Netflix, Spotify Duo, or YouTube Family plan with friends or roommates.
+- The Problem: 
+    - The app only allows one static amount. There is no way to specify "I pay half" or "This is shared with John, and he owes me ₹200." It treats every expense as an isolated, solo payment.
+
+3. The "Did I Actually Pay?" Blind Spot
+- Because the app does not connect to a real bank account API, it relies 100% on human discipline.
+- The Problem: 
+    - If a user cancels a subscription in real life but forgets to update it to "Cancelled" in your app, your app will blindly keep sending them reminder emails forever. It currently has no way to verify if a transaction actually occurred.
+
+4. Global Timezone Ignorance
+- I noticed in your backend code (reminderCron.js) that the daily email reminder job is strictly hardcoded to run at 09:00 AM IST (Asia/Kolkata timezone).
+- The Problem: 
+    - If someone from New York or London registers on your platform, their renewal date calculations will be skewed by the timezone difference, and they will receive your emails at completely arbitrary and annoying times of the night.
+
+5. Irregular Billing Cycles
+- The app beautifully handles Monthly, Yearly, and Weekly billing.
+- The Problem: 
+    - It completely misses "Quarterly" (every 3 months) or "Bi-Weekly" (every 14 days). Many enterprise software tools, VPNs, and utilities bill every 3 or 6 months.

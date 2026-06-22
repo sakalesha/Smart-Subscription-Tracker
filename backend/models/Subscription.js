@@ -50,6 +50,32 @@ const subscriptionSchema = new mongoose.Schema({
   lastReminderDate: { 
     type: String, 
     default: null 
+  },
+
+  aiCategory: {
+    type: String, 
+    default: null 
+  },
+
+  // NEW FIELDS FOR V2 FRONTEND
+  isTrial: {
+    type: Boolean,
+    default: false
+  },
+
+  trialEndDate: {
+    type: Date,
+    default: null
+  },
+
+  attachmentUrl: {
+    type: String,
+    default: null
+  },
+
+  cancellationUrl: {
+    type: String,
+    default: null
   }
 
 }, { timestamps: true });

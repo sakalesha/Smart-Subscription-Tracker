@@ -1,13 +1,11 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 
-const SummaryCards = ({ subscriptions }) => {
-  // Calculate summary statistics
+const SummaryCards = ({ subscriptions, forecast }) => {
   const totalSubscriptions = subscriptions.length;
   const activeSubscriptions = subscriptions.filter(sub => sub.status === 'Active').length;
   const expiredSubscriptions = subscriptions.filter(sub => sub.status === 'Expired').length;
-  
-  // Calculate total monthly spending
+
   const totalMonthlySpending = subscriptions
     .filter(sub => sub.status === 'Active')
     .reduce((sum, sub) => {
@@ -16,12 +14,11 @@ const SummaryCards = ({ subscriptions }) => {
       } else if (sub.renewalType === 'Yearly') {
         return sum + (sub.amount / 12);
       } else if (sub.renewalType === 'Weekly') {
-        return sum + (sub.amount * 4.33); // Approximate weeks per month
+        return sum + (sub.amount * 4.33);
       }
       return sum + sub.amount;
     }, 0);
 
-  // Find subscriptions due soon (within next 7 days)
   const now = new Date();
   const nextWeek = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
   const dueSoonSubscriptions = subscriptions.filter(sub => {
@@ -29,79 +26,127 @@ const SummaryCards = ({ subscriptions }) => {
     return renewalDate >= now && renewalDate <= nextWeek && sub.status === 'Active';
   }).length;
 
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-IN', {
+      style: 'currency',
+      currency: 'INR',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0
+    }).format(amount);
+  };
+
   const cards = [
     {
       title: 'Total Subscriptions',
       value: totalSubscriptions,
       icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
         </svg>
       ),
       gradient: 'from-blue-500 to-blue-600',
-      bgGradient: 'from-blue-50 to-blue-100',
-      textColor: 'text-blue-700'
+      lightBg: 'bg-blue-50',
+      darkBg: 'dark:bg-blue-900/20',
+      textColor: 'text-blue-600',
+      darkText: 'dark:text-blue-400'
     },
     {
-      title: 'Active Subscriptions',
+      title: 'Active',
       value: activeSubscriptions,
       icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
       gradient: 'from-emerald-500 to-emerald-600',
-      bgGradient: 'from-emerald-50 to-emerald-100',
-      textColor: 'text-emerald-700'
+      lightBg: 'bg-emerald-50',
+      darkBg: 'dark:bg-emerald-900/20',
+      textColor: 'text-emerald-600',
+      darkText: 'dark:text-emerald-400'
     },
     {
       title: 'Due Soon',
       value: dueSoonSubscriptions,
       icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
       gradient: 'from-amber-500 to-amber-600',
-      bgGradient: 'from-amber-50 to-amber-100',
-      textColor: 'text-amber-700'
+      lightBg: 'bg-amber-50',
+      darkBg: 'dark:bg-amber-900/20',
+      textColor: 'text-amber-600',
+      darkText: 'dark:text-amber-400'
     },
     {
       title: 'Monthly Spending',
-      value: `₹${totalMonthlySpending.toFixed(0)}`,
+      value: formatCurrency(totalMonthlySpending),
       icon: (
-        <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
         </svg>
       ),
       gradient: 'from-violet-500 to-violet-600',
-      bgGradient: 'from-violet-50 to-violet-100',
-      textColor: 'text-violet-700'
+      lightBg: 'bg-violet-50',
+      darkBg: 'dark:bg-violet-900/20',
+      textColor: 'text-violet-600',
+      darkText: 'dark:text-violet-400'
+    },
+    {
+      title: 'Next Month (AI)',
+      value: forecast ? formatCurrency(forecast.nextMonthForecast) : '—',
+      icon: (
+        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+        </svg>
+      ),
+      trend: forecast?.trend,
+      gradient: 'from-rose-500 to-rose-600',
+      lightBg: 'bg-rose-50',
+      darkBg: 'dark:bg-rose-900/20',
+      textColor: 'text-rose-600',
+      darkText: 'dark:text-rose-400'
     }
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
       {cards.map((card, index) => (
-        <motion.div 
+        <motion.div
           key={index}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: index * 0.1 }}
+          transition={{ duration: 0.4, delay: index * 0.08 }}
           whileHover={{ scale: 1.02, y: -2 }}
-          className={`bg-gradient-to-br ${card.bgGradient} dark:from-slate-800 dark:to-slate-700 rounded-2xl shadow-lg p-6 border border-white/50 dark:border-slate-600/50 hover:shadow-xl transition-all duration-300 backdrop-blur-sm`}
+          className={`relative ${card.lightBg} ${card.darkBg} rounded-2xl p-4 sm:p-5 border border-slate-200/60 dark:border-slate-700/60 overflow-hidden group`}
         >
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-slate-600 dark:text-slate-300 mb-2">{card.title}</p>
-              <p className={`text-3xl font-bold ${card.textColor}`}>{card.value}</p>
+          {/* Background Decoration */}
+          <div className={`absolute -top-8 -right-8 w-24 h-24 rounded-full bg-gradient-to-br ${card.gradient} opacity-10 group-hover:opacity-20 transition-opacity duration-300`} />
+
+          {/* Content */}
+          <div className="relative flex items-start justify-between">
+            <div className="flex-1 min-w-0">
+              <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mb-1 truncate">{card.title}</p>
+              <div className="flex items-baseline gap-2">
+                <p className={`text-xl sm:text-2xl font-bold ${card.textColor} ${card.darkText} truncate`}>
+                  {card.value}
+                </p>
+                {card.trend && (
+                  <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-semibold ${
+                    card.trend === 'Increasing' ? 'bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400' :
+                    card.trend === 'Decreasing' ? 'bg-emerald-100 text-emerald-600 dark:bg-emerald-900/30 dark:text-emerald-400' :
+                    'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-400'
+                  }`}>
+                    {card.trend === 'Increasing' ? '↑' : card.trend === 'Decreasing' ? '↓' : '→'}
+                  </span>
+                )}
+              </div>
             </div>
-            <motion.div 
-              whileHover={{ scale: 1.1, rotate: 5 }}
-              className={`bg-gradient-to-br ${card.gradient} rounded-xl p-3 text-white shadow-lg`}
-            >
-              {card.icon}
-            </motion.div>
+            <div className={`p-2.5 rounded-xl bg-gradient-to-br ${card.gradient} shadow-lg flex-shrink-0`}>
+              <div className="text-white">
+                {card.icon}
+              </div>
+            </div>
           </div>
         </motion.div>
       ))}

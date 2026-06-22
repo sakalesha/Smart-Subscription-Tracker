@@ -2,6 +2,8 @@
 import cron from "node-cron";
 import express from "express";
 import Subscription from "../models/Subscription.js";
+import User from "../models/User.js";
+import { updateMonthlySnapshot } from "../../ml/forecastService.js";
 import dotenv from "dotenv";
 import { Resend } from "resend";
 
@@ -106,6 +108,13 @@ cron.schedule("* * * * *", async () => {
 
   await sendRemindersForDate(in3, "3");
   await sendRemindersForDate(today, "0");
+
+  // ---- Take Spend Snapshots for Forecasting ----
+  const monthYM = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, "0")}`;
+  const users = await User.find({});
+  for (const user of users) {
+    await updateMonthlySnapshot(user._id, monthYM);
+  }
 
 }, { timezone: "Asia/Kolkata" });
 
